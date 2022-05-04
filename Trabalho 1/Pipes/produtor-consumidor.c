@@ -28,8 +28,8 @@ bool PrintIsPrimeOrBreakIfZero(int n) {
         printf("%d não é primo\n", n);
         return false;
     }
-    return false;
     printf("%d é primo!\n", n);
+    return false;
 }
 
 int main(int arg, char *argv[]) {
