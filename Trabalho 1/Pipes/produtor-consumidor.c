@@ -57,14 +57,17 @@ int main(int arg, char *argv[]) {
         while (numberOfIterations <= maxIterations) {
             numberOfIterations++;
             n = RandomNumberGenerator(n);
+            close(fd[0]);
             write(fd[1], &n, sizeof(int));
         }
         n = 0;
+        close(fd[0]);
         write(fd[1], &n, sizeof(int));
     } else {
         // consumer
         while (true) {
             int primeCandidate;
+            close(fd[1]);
             read(fd[0], &primeCandidate, sizeof(int));
             if (PrintIsPrimeOrBreakIfZero(primeCandidate)) {
                 break;
