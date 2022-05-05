@@ -33,6 +33,13 @@ bool PrintIsPrimeOrBreakIfZero(int n) {
 }
 
 int main(int arg, char *argv[]) {
+    if (arg != 2) {
+        printf("O programa deve receber um argumento.\n");
+        return 1;
+    }
+
+    int maxIterations = atoi(argv[1]);
+
     int fd[2];
     if (pipe(fd) == -1) {
         printf("Erro ao abrir o pipe\n");
@@ -41,9 +48,7 @@ int main(int arg, char *argv[]) {
     int pid = fork();
     if (pid == 0) {
         // producer
-
         int n = 0;
-        int maxIterations = 1000;
         int numberOfIterations = 0;
 
         while (numberOfIterations <= maxIterations) {
