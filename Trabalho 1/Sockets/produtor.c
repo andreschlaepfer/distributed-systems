@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <sys/socket.h>
+#include <time.h>
 #include <unistd.h>
 
 void PrintResult(int result) {
@@ -24,6 +25,8 @@ int RandomNumberGenerator(int n) {
 }
 
 int main(int arg, char *argv[]) {
+    srandom(time(NULL));
+
     int n = 1;
     int maxIterations = 10;
     int numberOfIterations = 1;

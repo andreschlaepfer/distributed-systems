@@ -4,10 +4,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 
 int RandomNumberGenerator(int n) {
-    return n + rand() % 100 + 1;
+    return n + random() % 100 + 1;
 }
 
 bool PrintIsPrimeOrBreakIfZero(int n) {
@@ -33,6 +34,8 @@ bool PrintIsPrimeOrBreakIfZero(int n) {
 }
 
 int main(int arg, char *argv[]) {
+    srandom(time(NULL));
+
     if (arg != 2) {
         printf("O programa deve receber um argumento.\n");
         return 1;
