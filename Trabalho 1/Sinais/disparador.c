@@ -27,7 +27,6 @@ int main(int arg, char *argv[]) {
 
     while (true) {
         int signal;
-        char runProgram;
 
         printf("Digite o sinal: ");
         if (scanf("%d", &signal) != 1) {
