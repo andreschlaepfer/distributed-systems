@@ -24,6 +24,13 @@ int main(int arg, char *argv[]) {
         return 1;
     }
 
+    const waitingMode = atoi(argv[1]);
+
+    if (waitingMode != 0 && waitingMode != 1) {
+        printf("O argumento deve ser 0 ou 1.\n\n0: busy wait\n1: blocking wait\n");
+        return 1;
+    }
+
     printf("PID do processo receptor: ");
     printf("%d\n", getpid());
 
@@ -34,15 +41,15 @@ int main(int arg, char *argv[]) {
     while (running) {
         printf("Processa, processa, processa, ...\n");
 
-        // blocking wait
-        if (atoi(argv[1]) == 1) {
-            pause();
-        }
-
         // busy wait
         if (atoi(argv[1]) == 0) {
             while (running)
                 ;
+        }
+
+        // blocking wait
+        if (atoi(argv[1]) == 1) {
+            pause();
         }
     }
 
