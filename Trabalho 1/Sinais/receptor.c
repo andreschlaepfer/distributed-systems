@@ -24,7 +24,7 @@ int main(int arg, char *argv[]) {
         return 1;
     }
 
-    printf("PID do processo recebedor: ");
+    printf("PID do processo receptor: ");
     printf("%d\n", getpid());
 
     signal(SIGUSR1, handle_sigusr1);
