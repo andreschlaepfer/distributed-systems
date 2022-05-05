@@ -31,7 +31,7 @@ int main(int arg, char *argv[]) {
 
     int server = socket(AF_INET, SOCK_STREAM, 0);
     bind(server, (struct sockaddr *)&saddr, sizeof saddr);
-    listen(server, 5);
+    listen(server, 1);
 
     int csize = sizeof caddr;
     int cliente;
