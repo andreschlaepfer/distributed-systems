@@ -19,6 +19,11 @@ void handle_sigterm(int signal) {
 }
 
 int main(int arg, char *argv[]) {
+    if (arg != 2) {
+        printf("O programa deve receber um argumento.\n\n0: busy wait\n1: blocking wait\n");
+        return 1;
+    }
+
     printf("PID do processo recebedor: ");
     printf("%d\n", getpid());
 
@@ -28,11 +33,17 @@ int main(int arg, char *argv[]) {
 
     while (running) {
         printf("Processa, processa, processa, ...\n");
-        pause();
-        if (running == false) {
-            break;
+
+        // blocking wait
+        if (atoi(argv[1]) == 1) {
+            pause();
         }
-        printf("De volta ao trabalho...\n");
+
+        // busy wait
+        if (atoi(argv[1]) == 0) {
+            while (running)
+                ;
+        }
     }
 
     return 0;
