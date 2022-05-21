@@ -42,7 +42,7 @@ void *sum(void *arg) {
 }
 
 void create_threads(int N, int K) {
-    pthread_t th[K];
+    pthread_t *th = (pthread_t *)malloc(sizeof(pthread_t) * K);
     struct lock lock;
     lock.held = 0;
     struct thread_args args[K];
@@ -56,6 +56,7 @@ void create_threads(int N, int K) {
     for (i = 0; i < K; i++) {
         pthread_join(th[i], NULL);
     }
+    free(th);
 }
 
 void generate_values(int N) {
