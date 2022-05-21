@@ -75,11 +75,11 @@ int main(int argc, char *argv[]) {
 
     int N = atoi(argv[1]);
     int K = atoi(argv[2]);
+    clock_t start, finish;
     double spentTime = 0;
 
     for (int i = 0; i < 10; i++) {
         values = (char *)malloc(sizeof(char) * N);
-        clock_t start, finish;
         generate_values(N);
         start = clock();
         create_threads(N, K);
