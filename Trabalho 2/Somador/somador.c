@@ -74,20 +74,20 @@ int main(int argc, char *argv[]) {
 
     int N = atoi(argv[1]);
     int K = atoi(argv[2]);
-    values = (char *)malloc(sizeof(char) * N);
+    double spentTime = 0;
 
-    generate_values(N);
-    create_threads(N, K);
-
-    printf("%d\n", acm);
-
-    int acm2 = 0;
-    for (int i = 0; i < N; i++) {
-        acm2 += values[i];
+    for (int i = 0; i < 10; i++) {
+        values = (char *)malloc(sizeof(char) * N);
+        clock_t start, finish;
+        generate_values(N);
+        start = clock();
+        create_threads(N, K);
+        finish = clock();
+        spentTime += (double)(finish - start) / CLOCKS_PER_SEC;
+        free(values);
     }
-    printf("%d\n", acm2);
 
-    free(values);
+    printf("%.6f", spentTime / 10);
 
     return 0;
 }
