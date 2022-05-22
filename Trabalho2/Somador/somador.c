@@ -48,9 +48,9 @@ void create_threads(int N, int K) {
     struct thread_args args[K];
     int i;
     for (i = 0; i < K; i++) {
-        args[i].start_range = i * N / K;
+        args[i].start_range = i * (int)(N / K);
         args[i].lock = lock;
-        args[i].end_range = (i + 1) * N / K;
+        args[i].end_range = (i + 1) * (int)(N / K);
         pthread_create(&th[i], NULL, &sum, (void *)&args[i]);
     }
     for (i = 0; i < K; i++) {
@@ -79,6 +79,7 @@ int main(int argc, char *argv[]) {
     double spentTime = 0;
 
     for (int i = 0; i < 10; i++) {
+        acm = 0;
         values = (char *)malloc(sizeof(char) * N);
         generate_values(N);
         start = clock();
