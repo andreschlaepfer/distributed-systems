@@ -7,11 +7,10 @@
 #include <time.h>
 
 #define CONSUMED_MAX pow(10, 5)
-#define MUST_PRINT_PRIMES 1
+#define MUST_PRINT_PRIMES 0
 
 int N;
 int *numbers;
-int numbers_qty = 0;
 int consumed = 0;
 pthread_t *threads;
 sem_t mutex;
@@ -29,28 +28,50 @@ int isPrime(int n) {
     return 1;
 }
 
+void produce_number() {
+    for (int i = 0; i < N; i++) {
+        if (numbers[i] == 0) {
+            numbers[i] = (rand() % (int)pow(10, 7)) + 1;
+            break;
+        }
+    }
+}
+
 void *producer() {
     while (consumed <= CONSUMED_MAX) {
         sem_wait(&empty);
         sem_wait(&mutex);
-        numbers[numbers_qty + 1] = (rand() % (int)pow(10, 7)) + 1;
-        numbers_qty++;
+        produce_number();
         sem_post(&mutex);
         sem_post(&full);
     }
     return NULL;
 }
 
+void consume_number() {
+    int number;
+    for (int i = 0; i < N; i++) {
+        if (numbers[i] != 0) {
+            number = numbers[i];
+            numbers[i] = 0;
+            break;
+        }
+    }
+    if (MUST_PRINT_PRIMES) {
+        if (isPrime(number)) {
+            printf("%d é primo!\n", number);
+        } else {
+            printf("%d não é primo!\n", number);
+        }
+    }
+    consumed++;
+}
+
 void *consumer() {
     while (consumed <= CONSUMED_MAX) {
         sem_wait(&full);
         sem_wait(&mutex);
-        int number = numbers[numbers_qty - 1];
-        numbers_qty--;
-        if (MUST_PRINT_PRIMES && isPrime(number)) {
-            printf("%d é primo!\n", number);
-        }
-        consumed++;
+        consume_number();
         sem_post(&mutex);
         sem_post(&empty);
     }
@@ -89,10 +110,8 @@ int main(int argc, char *argv[]) {
 
     srand(time(NULL));
 
-    numbers = (int *)malloc(sizeof(int) * N);
-
     for (int i = 0; i < 10; i++) {
-        numbers_qty = 0;
+        numbers = (int *)malloc(sizeof(int) * N);
         consumed = 0;
 
         sem_init(&mutex, 0, 1);
@@ -108,6 +127,7 @@ int main(int argc, char *argv[]) {
         sem_destroy(&mutex);
         sem_destroy(&full);
         sem_destroy(&empty);
+        free(numbers);
     }
 
     printf("%.6f", spentTime / 10);
