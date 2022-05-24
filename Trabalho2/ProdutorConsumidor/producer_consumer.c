@@ -38,7 +38,7 @@ void produce_number() {
 }
 
 void *producer() {
-    while (consumed <= CONSUMED_MAX) {
+    while (consumed < CONSUMED_MAX) {
         sem_wait(&empty);
         sem_wait(&mutex);
         produce_number();
@@ -48,7 +48,7 @@ void *producer() {
     return NULL;
 }
 
-void consume_number() {
+int consume_number() {
     int number;
     for (int i = 0; i < N; i++) {
         if (numbers[i] != 0) {
@@ -57,23 +57,26 @@ void consume_number() {
             break;
         }
     }
-    if (MUST_PRINT_PRIMES) {
-        if (isPrime(number)) {
-            printf("%d é primo!\n", number);
-        } else {
-            printf("%d não é primo!\n", number);
-        }
-    }
     consumed++;
+    return number;
 }
 
 void *consumer() {
-    while (consumed <= CONSUMED_MAX) {
+    int number = 0;
+    while (consumed < CONSUMED_MAX) {
         sem_wait(&full);
         sem_wait(&mutex);
-        consume_number();
+        number = consume_number();
         sem_post(&mutex);
         sem_post(&empty);
+
+        if (MUST_PRINT_PRIMES) {
+            if (isPrime(number)) {
+                printf("%d é primo!\n", number);
+            } else {
+                printf("%d não é primo!\n", number);
+            }
+        }
     }
     return NULL;
 }
