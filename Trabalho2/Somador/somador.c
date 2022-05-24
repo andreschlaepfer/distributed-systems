@@ -53,6 +53,7 @@ void create_threads(int N, int K) {
         args[i].end_range = (i + 1) * (int)(N / K);
         pthread_create(&th[i], NULL, &sum, (void *)&args[i]);
     }
+    free(args);
     for (i = 0; i < K; i++) {
         pthread_join(th[i], NULL);
     }
