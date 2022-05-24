@@ -31,7 +31,7 @@ void *sum(void *arg) {
     int sum = 0;
 
     for (int i = args->start_range; i < args->end_range; i++) {
-        sum += values[i];
+        sum += (int)values[i];
     }
 
     acquire(args->lock);
@@ -45,8 +45,8 @@ void create_threads(int N, int K) {
     pthread_t *th = (pthread_t *)malloc(sizeof(pthread_t) * K);
     struct lock lock;
     lock.held = 0;
-    struct thread_args args[K];
     int i;
+    struct thread_args *args = (struct thread_args *)malloc(sizeof(struct thread_args) * K);
     for (i = 0; i < K; i++) {
         args[i].start_range = i * (int)(N / K);
         args[i].lock = lock;
