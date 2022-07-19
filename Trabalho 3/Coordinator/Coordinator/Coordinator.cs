@@ -39,25 +39,32 @@ namespace Coordinator {
                     // if request
                     if (message.StartsWith("1")) {
                         AddToQueueSafe(clientId);
-                        while (Queue.First() != clientId) { // spin wait
+                        while (!CheckQueueHeadSafe(clientId)) { // spin wait
                         }
                         var grant = GenerateMessage(MessageType.Grant, clientId);
                         sw.WriteLine(grant);
                         UpdateMessagesSafe(message);
-                    }
-                    if (!message.StartsWith("3")) {
+                        sw.Flush();
                         continue;
                     }
                     // if release
-                    UpdateClientsStateSafe(Queue.Dequeue());
+                    string clientToUpdate;
+                    lock (Lock) {
+                        clientToUpdate = Queue.Dequeue();
+                    }
+                    UpdateClientsStateSafe(clientToUpdate);
                     UpdateMessagesSafe(message);
-                    sw.Flush();
-
+                    return;
                 } catch (Exception e) {
                     connected = false;
                     Console.WriteLine(e);
                     Console.WriteLine(e.StackTrace);
                 }
+            }
+        }
+        public static bool CheckQueueHeadSafe(string clientId) {
+            lock (Lock) {
+                return Queue.First() == clientId;
             }
         }
 

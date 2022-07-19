@@ -78,9 +78,8 @@ namespace Client {
                 using var fs = File.Create(fileName);
             }
             using var writer = new StreamWriter(fileName, true);
-            writer.WriteLine($"Client Id: {Id}. DateTime: {DateTime.Now}");
+            writer.WriteLine($"Client Id: {Id}. DateTime: {DateTime.Now}:{DateTime.Now.Millisecond}");
         }
-
     }
     public enum MessageType {
         Unset,
