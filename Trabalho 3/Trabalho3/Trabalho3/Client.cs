@@ -3,7 +3,6 @@ using System.Text;
 
 namespace Client {
     public class Client {
-        private readonly Random _random = new((int)DateTime.Now.Ticks);
         public Client(int id, int repetitions, int waitTime) {
             Id = id;
             Repetitions = repetitions;
@@ -15,17 +14,6 @@ namespace Client {
         public int WaitTime { get; set; }
         public int Port { get; set; }
         public TcpClient SocketClient { get; set; }
-
-        public string GenerateMessage(MessageType msgType) {
-            var size = 10;
-            var message = $"{Convert.ToInt32(msgType)}|{Id}|";
-            if (message.Length >= size) {
-                throw new Exception("Message length was greater than expected!");
-            }
-            var difference = size - message.Length;
-            var zeros = new string('0', difference);
-            return message + zeros;
-        }
 
         public void Connect() {
             var i = 1;
@@ -79,6 +67,16 @@ namespace Client {
             }
             using var writer = new StreamWriter(fileName, true);
             writer.WriteLine($"Client Id: {Id}. DateTime: {DateTime.Now}:{DateTime.Now.Millisecond}");
+        }
+        public string GenerateMessage(MessageType msgType) {
+            var size = 10;
+            var message = $"{Convert.ToInt32(msgType)}|{Id}|";
+            if (message.Length >= size) {
+                throw new Exception("Message length was greater than expected!");
+            }
+            var difference = size - message.Length;
+            var zeros = new string('0', difference);
+            return message + zeros;
         }
     }
     public enum MessageType {
