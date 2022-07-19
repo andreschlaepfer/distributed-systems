@@ -8,7 +8,7 @@
             Console.WriteLine("Enter K:");
             var k = Convert.ToInt32(Console.ReadLine());
 
-            for (var i = 1; i <= n; i++) { // starting with 1 ?
+            for (var i = 1; i <= n; i++) {
                 var newClient = new Client(i, r, k);
                 var newThread = new Thread(newClient.Connect);
                 newThread.Start();

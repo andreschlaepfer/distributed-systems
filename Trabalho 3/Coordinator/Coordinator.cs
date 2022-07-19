@@ -4,8 +4,8 @@ using System.Text;
 namespace Coordinator {
     public static class Coordinator {
         public static object Lock = new();
+        public static object LogLocker = new();
         public static TcpListener Listener = new(System.Net.IPAddress.Any, 3000);
-        public static List<string> Messages = new();
         public static Queue<string> Queue = new();
         public static Dictionary<string, int> ClientsState = new();
         public static void Listen() {
@@ -35,15 +35,15 @@ namespace Coordinator {
                     stream.Read(buffer, 0, buffer.Length);
                     var message = Encoding.UTF8.GetString(buffer, 0, 10);
                     var clientId = message.Split("|").ToList()[1];
-                    UpdateMessagesSafe(message);
                     // if request
                     if (message.StartsWith("1")) {
                         AddToQueueSafe(clientId);
+                        WriteLogSafe(clientId, MessageType.Request);
                         while (!CheckQueueHeadSafe(clientId)) { // spin wait
                         }
                         var grant = GenerateMessage(MessageType.Grant, clientId);
                         sw.WriteLine(grant);
-                        UpdateMessagesSafe(message);
+                        WriteLogSafe(clientId, MessageType.Grant);
                         sw.Flush();
                         continue;
                     }
@@ -53,7 +53,7 @@ namespace Coordinator {
                         clientToUpdate = Queue.Dequeue();
                     }
                     UpdateClientsStateSafe(clientToUpdate);
-                    UpdateMessagesSafe(message);
+                    WriteLogSafe(clientId, MessageType.Release);
                     return;
                 } catch (Exception e) {
                     connected = false;
@@ -67,16 +67,26 @@ namespace Coordinator {
                 return Queue.First() == clientId;
             }
         }
-
-        public static void WriteLog(string clientId, string messageType) {
-            var folderName = Path.Combine("C:/Users/andre/ProjetosUFRJ/distributed-systems/Trabalho 3/Trabalho3/", "Resultados");
+        public static void WriteLogSafe(string clientId, MessageType msgType) {
+            lock (LogLocker) {
+                WriteLogUnsafe(clientId, msgType);
+            }
+        }
+        public static void WriteLogUnsafe(string clientId, MessageType msgType) {
+            var folderName = Path.Combine("C:/Users/andre/ProjetosUFRJ/distributed-systems/Trabalho 3/", "Resultados");
             Directory.CreateDirectory(folderName);
-            var fileName = Path.Combine(folderName, "coordinator-logs.txt");
+            var fileName = Path.Combine(folderName, "log.txt");
             if (!File.Exists(fileName)) {
                 using var fs = File.Create(fileName);
             }
+            var msg = msgType switch {
+                MessageType.Request => $"[R] Request - {clientId} - DateTime: {DateTime.Now}",
+                MessageType.Grant => $"[G] Grant - {clientId} - DateTime: {DateTime.Now}",
+                MessageType.Release => $"[R] Release - {clientId} - DateTime: {DateTime.Now}",
+                _ => ""
+            };
             using var writer = new StreamWriter(fileName, true);
-            writer.WriteLine($"Client Id: {clientId}. Message: {messageType}. DateTime: {DateTime.Now}");
+            writer.WriteLine(msg);
         }
 
         public static void Terminal() {
@@ -111,12 +121,6 @@ namespace Coordinator {
                 foreach (var client in Queue) {
                     Console.WriteLine($"{client}");
                 }
-            }
-        }
-
-        public static void UpdateMessagesSafe(string message) {
-            lock (Lock) {
-                Messages.Add(message);
             }
         }
         public static void UpdateClientsStateSafe(string clientId) {
