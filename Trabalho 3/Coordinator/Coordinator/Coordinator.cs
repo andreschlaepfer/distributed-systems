@@ -31,28 +31,19 @@ namespace Coordinator {
             var connected = true;
             while (connected) {
                 try {
-                    var buffer = new byte[10];
+                    var buffer = new byte[1024];
                     stream.Read(buffer, 0, buffer.Length);
                     var message = Encoding.UTF8.GetString(buffer, 0, 10);
                     var clientId = message.Split("|").ToList()[1];
                     UpdateMessagesSafe(message);
                     // if request
                     if (message.StartsWith("1")) {
-                        if (!Queue.Any()) {
-                            var grant = GenerateMessage(MessageType.Grant, clientId);
-                            sw.WriteLine(grant);
-                            sw.Flush();
-                            UpdateMessagesSafe(message);
-                        }
                         AddToQueueSafe(clientId);
-                        if (Queue.Any()) {
-                            while (Queue.First() != clientId) {
-                            }
-                            var grant = GenerateMessage(MessageType.Grant, clientId);
-                            sw.WriteLine(grant);
-                            sw.Flush();
-                            UpdateMessagesSafe(message);
+                        while (Queue.First() != clientId) { // spin wait
                         }
+                        var grant = GenerateMessage(MessageType.Grant, clientId);
+                        sw.WriteLine(grant);
+                        UpdateMessagesSafe(message);
                     }
                     if (!message.StartsWith("3")) {
                         continue;
@@ -60,6 +51,7 @@ namespace Coordinator {
                     // if release
                     UpdateClientsStateSafe(Queue.Dequeue());
                     UpdateMessagesSafe(message);
+                    sw.Flush();
 
                 } catch (Exception e) {
                     connected = false;
@@ -67,11 +59,6 @@ namespace Coordinator {
                     Console.WriteLine(e.StackTrace);
                 }
             }
-        }
-
-        public static void SendGrantMessage(string clientId) {
-            var grant = GenerateMessage(MessageType.Grant, clientId);
-
         }
 
         public static void WriteLog(string clientId, string messageType) {
@@ -146,7 +133,7 @@ namespace Coordinator {
             if (message.Length >= size) {
                 throw new Exception("Message length was greater than expected!");
             }
-            var difference = -message.Length;
+            var difference = size - message.Length;
             var zeros = new string('0', difference);
             return message + zeros;
         }

@@ -8,8 +8,7 @@ namespace Client {
             Id = id;
             Repetitions = repetitions;
             WaitTime = waitTime * 1000;
-            Port = _random.Next(1000, 8000);
-            SocketClient = new TcpClient("127.0.0.1", Port);
+            Port = 3000;
         }
         public int Id { get; set; }
         public int Repetitions { get; set; }
@@ -23,7 +22,7 @@ namespace Client {
             if (message.Length >= size) {
                 throw new Exception("Message length was greater than expected!");
             }
-            var difference = -message.Length;
+            var difference = size - message.Length;
             var zeros = new string('0', difference);
             return message + zeros;
         }
@@ -39,6 +38,7 @@ namespace Client {
             }
             try {
                 while (i <= Repetitions) {
+                    SocketClient = new TcpClient("127.0.0.1", Port);
                     var stream = SocketClient.GetStream();
                     //request
                     stream.Write(sendRequestData, 0, sendRequestData.Length);
@@ -60,6 +60,7 @@ namespace Client {
 
                     i++;
                     stream.Close();
+                    SocketClient.Close();
                 }
             } catch (Exception) {
                 Console.WriteLine("Failed to connect");
@@ -67,7 +68,6 @@ namespace Client {
                 Thread.Sleep(2000);
                 goto connection;
             }
-            SocketClient.Close();
         }
 
         public void WriteLog() {
