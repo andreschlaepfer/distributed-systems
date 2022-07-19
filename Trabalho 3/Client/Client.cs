@@ -59,7 +59,7 @@ namespace Client {
         }
 
         public void WriteLog() {
-            var folderName = Path.Combine("C:/Users/andre/ProjetosUFRJ/distributed-systems/Trabalho 3/Trabalho3/", "Resultados");
+            var folderName = Path.Combine("C:/Users/andre/ProjetosUFRJ/distributed-systems/Trabalho 3/", "Resultados");
             Directory.CreateDirectory(folderName);
             var fileName = Path.Combine(folderName, "resultado.txt");
             if (!File.Exists(fileName)) {

@@ -1,4 +1,4 @@
-﻿namespace Trabalho3 {
+﻿namespace Client {
     public class Run {
         public static void Main() {
             Console.WriteLine("Enter N:");
@@ -9,7 +9,7 @@
             var k = Convert.ToInt32(Console.ReadLine());
 
             for (var i = 1; i <= n; i++) { // starting with 1 ?
-                var newClient = new Client.Client(i, r, k);
+                var newClient = new Client(i, r, k);
                 var newThread = new Thread(newClient.Connect);
                 newThread.Start();
             }

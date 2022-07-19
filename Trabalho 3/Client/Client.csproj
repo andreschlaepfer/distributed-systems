@@ -5,7 +5,13 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <StartupObject>Trabalho3.Run</StartupObject>
+    <StartupObject>Client.Run</StartupObject>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Resultados\**" />
+    <EmbeddedResource Remove="Resultados\**" />
+    <None Remove="Resultados\**" />
+  </ItemGroup>
 
 </Project>
