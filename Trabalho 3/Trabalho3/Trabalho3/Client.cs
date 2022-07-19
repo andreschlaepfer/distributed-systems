@@ -33,41 +33,41 @@ namespace Client {
             var numTries = 0;
             var sendRequestData = Encoding.ASCII.GetBytes(GenerateMessage(MessageType.Request));
             var sendReleaseData = Encoding.ASCII.GetBytes(GenerateMessage(MessageType.Release));
-            NetworkStream stream;
         connection:
             if (numTries > 10) {
                 return;
             }
             try {
-                stream = SocketClient.GetStream();
+                while (i <= Repetitions) {
+                    var stream = SocketClient.GetStream();
+                    //request
+                    stream.Write(sendRequestData, 0, sendRequestData.Length);
+                    Console.WriteLine($"Client {Id} sending request message to coordinator...");
+
+                    //Read Grant
+                    var sr = new StreamReader(stream);
+                    var response = sr.ReadLine();
+                    if (response.StartsWith("2")) {
+                        //Enter critical area
+                        WriteLog();
+                    }
+                    Console.WriteLine(response);
+                    Thread.Sleep(WaitTime);
+
+                    //release
+                    stream.Write(sendReleaseData, 0, sendReleaseData.Length);
+                    Console.WriteLine($"Client {Id} sending release message to coordinator...");
+
+                    i++;
+                    stream.Close();
+                }
             } catch (Exception) {
                 Console.WriteLine("Failed to connect");
                 numTries++;
                 Thread.Sleep(2000);
                 goto connection;
             }
-
-            while (i <= Repetitions) {
-                //request
-                stream.Write(sendRequestData, 0, sendRequestData.Length);
-                Console.WriteLine($"Client {Id} sending request message to coordinator...");
-
-                //Read Grant
-                var sr = new StreamReader(stream);
-                var response = sr.ReadLine();
-                if (response?[..1] == "2") {
-                    //Enter critical area
-                    WriteLog();
-                }
-                Console.WriteLine(response);
-                Thread.Sleep(WaitTime);
-
-                //release
-                stream.Write(sendReleaseData, 0, sendReleaseData.Length);
-                Console.WriteLine($"Client {Id} sending release message to coordinator...");
-
-                i++;
-            }
+            SocketClient.Close();
         }
 
         public void WriteLog() {
