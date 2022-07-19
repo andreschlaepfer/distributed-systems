@@ -6,13 +6,12 @@ namespace Coordinator {
         public static TcpListener Listener = new(System.Net.IPAddress.Any, 3000);
         public static List<string> Messages = new();
         public static Queue<string> Queue = new();
-        public static Dictionary<int, int> ClientsState = new();
+        public static Dictionary<string, int> ClientsState = new();
         public static void Listen() {
             Console.WriteLine("Waiting for connection...");
             Listener.Start();
 
             while (true) {
-                Thread.Sleep(10);
                 var client = Listener.AcceptTcpClient();
                 Console.WriteLine("Accepted Client");
 
@@ -25,16 +24,21 @@ namespace Coordinator {
 
         public static void ClientHandler(object c) {
             var client = (TcpClient)c;
-            var netStream = client.GetStream();
-
+            var stream = client.GetStream();
             var connected = true;
             while (connected) {
-                Thread.Sleep(10);
                 try {
-                    var bytes = new byte[client.ReceiveBufferSize];
-                    var requestMessage = netStream.Read(bytes, 0, bytes.Length);
-                    Console.WriteLine("got data");
-                    netStream.Write(bytes, 0, bytes.Length);
+                    var sr = new StreamReader(stream);
+                    var message = sr.ReadLine();
+                    if (message == null) {
+                        continue;
+                    }
+                    var clientId = message.Split("|").ToList()[1];
+                    UpdateMessagesSafe(clientId);
+                    if (message.StartsWith("1")) {
+                        AddToQueueSafe(clientId);
+                    }
+
 
                 } catch (Exception e) {
                     connected = false;
@@ -90,9 +94,23 @@ namespace Coordinator {
             }
         }
 
-        public void UpdateSharedDataSafe() {
+        public static void UpdateMessagesSafe(string message) {
             lock (Lock) {
-
+                Messages.Add(message);
+            }
+        }
+        public static void UpdateClientsStateSafe(string clientId) {
+            lock (Lock) {
+                if (ClientsState.TryGetValue(clientId, out _)) {
+                    ClientsState[clientId] += 1;
+                } else {
+                    ClientsState.Add(clientId, 1);
+                }
+            }
+        }
+        public static void AddToQueueSafe(string clientId) {
+            lock (Lock) {
+                Queue.Enqueue(clientId);
             }
         }
     }

@@ -17,12 +17,22 @@ namespace Client {
         public int Port { get; set; }
         public TcpClient SocketClient { get; set; }
 
+        public string GenerateMessage(MessageType msgType) {
+            var size = 10;
+            var message = $"{Convert.ToInt32(msgType)}|{Id}|";
+            if (message.Length >= size) {
+                throw new Exception("Message length was greater than expected!");
+            }
+            var difference = -message.Length;
+            var zeros = new string('0', difference);
+            return message + zeros;
+        }
 
         public void Connect() {
             var i = 1;
             var numTries = 0;
-            var sendRequestData = Encoding.ASCII.GetBytes($"1|{Id}|000000");
-            var sendReleaseData = Encoding.ASCII.GetBytes($"3|{Id}|000000");
+            var sendRequestData = Encoding.ASCII.GetBytes(GenerateMessage(MessageType.Request));
+            var sendReleaseData = Encoding.ASCII.GetBytes(GenerateMessage(MessageType.Release));
             NetworkStream stream;
         connection:
             if (numTries > 10) {
@@ -71,5 +81,11 @@ namespace Client {
             writer.WriteLine($"Client Id: {Id}. DateTime: {DateTime.Now}");
         }
 
+    }
+    public enum MessageType {
+        Unset,
+        Request,
+        Grant,
+        Release
     }
 }
