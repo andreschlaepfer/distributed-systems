@@ -28,9 +28,9 @@ public static class Coordinator
     }
     var msg = msgType switch
     {
-      MessageType.Request => $"[R] Request - {clientId} - DateTime: {DateTime.Now}:{DateTime.Now.Millisecond}",
-      MessageType.Grant => $"[S] Grant - {clientId} - DateTime: {DateTime.Now}:{DateTime.Now.Millisecond}",
-      MessageType.Release => $"[R] Release - {clientId} - DateTime: {DateTime.Now}:{DateTime.Now.Millisecond}",
+      MessageType.Request => $"[R] Request - {clientId} - DateTime: {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss.fff")}",
+      MessageType.Grant => $"[S] Grant - {clientId} - DateTime: {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss.fff")}",
+      MessageType.Release => $"[R] Release - {clientId} - DateTime: {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss.fff")}",
       _ => ""
     };
     var writer = new StreamWriter(fileName, true);

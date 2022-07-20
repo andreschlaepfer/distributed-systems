@@ -46,13 +46,13 @@ namespace Client
           {
             //Enter critical area
             WriteLog();
-          }
-          Console.WriteLine(response);
-          Thread.Sleep(WaitTime);
+            Console.WriteLine(response);
+            Thread.Sleep(WaitTime);
 
-          //release
-          stream.Write(sendReleaseData, 0, sendReleaseData.Length);
-          Console.WriteLine($"Client {Id} sending release message to coordinator...");
+            //release
+            stream.Write(sendReleaseData, 0, sendReleaseData.Length);
+            Console.WriteLine($"Client {Id} sending release message to coordinator...");
+          }
 
           i++;
           stream.Close();
@@ -78,7 +78,7 @@ namespace Client
         using var fs = File.Create(fileName);
       }
       using var writer = new StreamWriter(fileName, true);
-      writer.WriteLine($"Client Id: {Id}. DateTime: {DateTime.Now}:{DateTime.Now.Millisecond}");
+      writer.WriteLine($"Client Id: {Id}. DateTime: {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss.fff")}");
     }
     public string GenerateMessage(MessageType msgType)
     {
