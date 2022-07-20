@@ -3,11 +3,12 @@ using System.Text;
 
 namespace Coordinator {
     public static class Coordinator {
+        public static Dictionary<string, Thread> Threads = new();
         public static object Lock = new();
         public static object LogLocker = new();
-        public static TcpListener Listener = new(System.Net.IPAddress.Any, 3000);
         public static Queue<string> Queue = new();
         public static Dictionary<string, int> ClientsState = new();
+        public static TcpListener Listener = new(System.Net.IPAddress.Any, 3000);
         public static void Listen() {
             Console.WriteLine("Waiting for connection...");
             Listener.Start();
@@ -35,25 +36,39 @@ namespace Coordinator {
                     stream.Read(buffer, 0, buffer.Length);
                     var message = Encoding.UTF8.GetString(buffer, 0, 10);
                     var clientId = message.Split("|").ToList()[1];
+                    Thread.CurrentThread.Name = clientId;
                     // if request
                     if (message.StartsWith("1")) {
                         AddToQueueSafe(clientId);
-                        WriteLogSafe(clientId, MessageType.Request);
-                        while (!CheckQueueHeadSafe(clientId)) { // spin wait
+                        lock (Threads) {
+                            Threads.Add(clientId, Thread.CurrentThread);
+                        }
+                        while (!CheckQueuePeekSafe(clientId)) { // spin wait
+                            try {
+                                Thread.Sleep(Timeout.Infinite);
+                            } catch (ThreadInterruptedException) { }
                         }
                         var grant = GenerateMessage(MessageType.Grant, clientId);
-                        sw.WriteLine(grant);
                         WriteLogSafe(clientId, MessageType.Grant);
+                        sw.WriteLine(grant);
                         sw.Flush();
                         continue;
                     }
                     // if release
+                    WriteLogSafe(clientId, MessageType.Release);
+                    lock (Threads) {
+                        Threads.Remove(clientId);
+                    }
+                    sw.WriteLine("ACK");
+                    sw.Flush();
                     string clientToUpdate;
                     lock (Lock) {
                         clientToUpdate = Queue.Dequeue();
+                        if (Queue.Any()) {
+                            Threads[Queue.Peek()].Interrupt();
+                        }
                     }
                     UpdateClientsStateSafe(clientToUpdate);
-                    WriteLogSafe(clientId, MessageType.Release);
                     return;
                 } catch (Exception e) {
                     connected = false;
@@ -62,9 +77,9 @@ namespace Coordinator {
                 }
             }
         }
-        public static bool CheckQueueHeadSafe(string clientId) {
+        public static bool CheckQueuePeekSafe(string clientId) {
             lock (Lock) {
-                return Queue.First() == clientId;
+                return Queue.Peek() == clientId;
             }
         }
         public static void WriteLogSafe(string clientId, MessageType msgType) {
@@ -80,9 +95,9 @@ namespace Coordinator {
                 using var fs = File.Create(fileName);
             }
             var msg = msgType switch {
-                MessageType.Request => $"[R] Request - {clientId} - DateTime: {DateTime.Now}",
-                MessageType.Grant => $"[G] Grant - {clientId} - DateTime: {DateTime.Now}",
-                MessageType.Release => $"[R] Release - {clientId} - DateTime: {DateTime.Now}",
+                MessageType.Request => $"[R] Request - {clientId} - DateTime: {DateTime.Now}:{DateTime.Now.Millisecond}",
+                MessageType.Grant => $"[S] Grant - {clientId} - DateTime: {DateTime.Now}:{DateTime.Now.Millisecond}",
+                MessageType.Release => $"[R] Release - {clientId} - DateTime: {DateTime.Now}:{DateTime.Now.Millisecond}",
                 _ => ""
             };
             using var writer = new StreamWriter(fileName, true);
@@ -112,7 +127,7 @@ namespace Coordinator {
         private static void PrintClientsState() {
             lock (Lock) {
                 foreach (var kvp in ClientsState) {
-                    Console.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+                    Console.WriteLine($"Client = {kvp.Key}, Processed Messages = {kvp.Value}");
                 }
             }
         }
@@ -135,6 +150,7 @@ namespace Coordinator {
         public static void AddToQueueSafe(string clientId) {
             lock (Lock) {
                 Queue.Enqueue(clientId);
+                WriteLogUnsafe(clientId, MessageType.Request);
             }
         }
 
@@ -152,7 +168,8 @@ namespace Coordinator {
             Unset,
             Request,
             Grant,
-            Release
+            Release,
+            Ack
         }
     }
 }
