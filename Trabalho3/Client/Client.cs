@@ -46,6 +46,9 @@ namespace Client {
                     stream.Write(sendReleaseData, 0, sendReleaseData.Length);
                     Console.WriteLine($"Client {Id} sending release message to coordinator...");
 
+                    //Read ACK
+                    sr.ReadLine();
+
                     i++;
                 }
             } catch (Exception) {
