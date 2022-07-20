@@ -1,6 +1,10 @@
+import os 
+
 def validate():
-    f = open("log.txt", "r")
-    r = open("resultado.txt", "r")
+    dir = os.path.dirname(os.path.realpath(__file__))
+
+    f = open(dir + "/log.txt", "r")
+    r = open(dir +"/resultado.txt", "r")
     rLines = r.readlines()
     lines = f.readlines()
     requests = []

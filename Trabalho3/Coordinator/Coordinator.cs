@@ -37,17 +37,20 @@ public static class Coordinator
         var buffer = new byte[1024];
         stream.Read(buffer, 0, buffer.Length);
         var message = Encoding.UTF8.GetString(buffer, 0, 10);
-        var messageType = message.Split("|").ToList()[0];
-        var clientId = message.Split("|").ToList()[1];
-
-        switch (messageType)
+        if (message.Contains('|'))
         {
-          case "1":
-            Request(clientId, client);
-            break;
-          case "3":
-            Release(clientId);
-            break;
+          var messageType = message.Split("|").ToList()[0];
+          var clientId = message.Split("|").ToList()[1];
+
+          switch (messageType)
+          {
+            case "1":
+              Request(clientId, client);
+              break;
+            case "3":
+              Release(clientId);
+              break;
+          }
         }
       }
       catch (Exception)
@@ -146,7 +149,7 @@ public static class Coordinator
 
   private static void WriteLog(string clientId, MessageType msgType)
   {
-    var folderName = Path.Combine("C:/Users/andre/ProjetosUFRJ/distributed-systems/Trabalho3/", "Resultados");
+    var folderName = Path.Combine($"{Directory.GetCurrentDirectory()}/..", "Resultados");
     Directory.CreateDirectory(folderName);
     var fileName = Path.Combine(folderName, "log.txt");
     if (!File.Exists(fileName))
@@ -227,9 +230,9 @@ public static class Coordinator
       }
     }
   }
+
   public enum MessageType
   {
-    Unset,
     Request = 1,
     Grant = 2,
     Release = 3
