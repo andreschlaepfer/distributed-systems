@@ -10,7 +10,7 @@ namespace Client
       Id = id;
       Repetitions = repetitions;
       WaitTime = waitTime * 1000;
-      Port = 3000;
+      Port = 8080;
     }
     public int Id { get; set; }
     public int Repetitions { get; set; }
@@ -70,7 +70,7 @@ namespace Client
 
     public void WriteLog()
     {
-      var folderName = Path.Combine($"{Directory.GetCurrentDirectory()}/..", "Resultados");
+      var folderName = Path.Combine("../", "Resultados");
       Directory.CreateDirectory(folderName);
       var fileName = Path.Combine(folderName, "resultado.txt");
       if (!File.Exists(fileName))
@@ -95,8 +95,9 @@ namespace Client
   }
   public enum MessageType
   {
-    Request = 1,
-    Grant = 2,
-    Release = 3
+    Unset,
+    Request,
+    Grant,
+    Release
   }
 }
