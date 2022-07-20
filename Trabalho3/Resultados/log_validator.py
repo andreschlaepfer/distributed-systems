@@ -1,5 +1,5 @@
 def validate():
-    f = open("/Users/thiago/Projetos/Faculdade/distributed-systems/MEU/Resultados/log.txt", "r")
+    f = open("/Users/thiago/Projetos/Faculdade/distributed-systems/Trabalho3/Resultados/log.txt", "r")
     lines = f.readlines()
     requests = []
     grants = []

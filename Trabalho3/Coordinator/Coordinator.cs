@@ -112,8 +112,9 @@ public static class Coordinator
         var buffer = new byte[1024];
         stream.Read(buffer, 0, buffer.Length);
         var message = Encoding.UTF8.GetString(buffer, 0, 10);
-        var messageType = message.Split("|").ToList()[0];
-        var clientId = message.Split("|").ToList()[1];
+        string[] split = message.Split('|');
+        string messageType = split[0].ToString();
+        string clientId = split[1].ToString();
         switch (messageType)
         {
           case "1":
@@ -137,13 +138,11 @@ public static class Coordinator
 
   public static void listener()
   {
-    Console.WriteLine("Waiting for connection...");
     socket.Start();
 
     while (true)
     {
       var client = socket.AcceptTcpClient();
-      Console.WriteLine("Accepted Client");
 
       var thread = new Thread(new ParameterizedThreadStart(clientHandler))
       {
@@ -153,25 +152,28 @@ public static class Coordinator
     }
   }
 
-
   private static void terminal()
   {
-    Console.WriteLine("Insira:");
-    Console.WriteLine("  1: imprimir a fila atual");
-    Console.WriteLine("  2: para imprimir o estado dos clientes");
-    Console.WriteLine("  3: para sair");
+    Console.WriteLine(" ------------------------------------------");
+    Console.WriteLine("| Insira:                                  |");
+    Console.WriteLine("|   1: imprimir a fila atual               |");
+    Console.WriteLine("|   2: para imprimir o estado dos clientes |");
+    Console.WriteLine("|   3: para sair                           |");
+    Console.WriteLine(" ------------------------------------------");
     while (true)
     {
+      Console.WriteLine("\n-----------------------------------------\n");
       Console.Write("Insira o comando: ");
       var n = Convert.ToInt32(Console.ReadLine());
-      Console.WriteLine("");
       switch (n)
       {
         case 1:
-          printCurrentQueue();
+          var currentQueue = Queue;
+          printCurrentQueue(currentQueue);
           break;
         case 2:
-          // PrintClientsState();
+          var currentGranted = Granted;
+          printGranted(currentGranted);
           break;
         case 3:
           Environment.Exit(Environment.ExitCode);
@@ -180,16 +182,26 @@ public static class Coordinator
     }
   }
 
-  private static void printCurrentQueue()
+  private static void printCurrentQueue(Queue<KeyValuePair<string, TcpClient>> queue)
   {
     lock (Lock)
     {
       Console.WriteLine("");
-      foreach (var clientId in Queue)
+      Console.Write("<--- [");
+      foreach (var kvp in queue)
       {
-        Console.Write($"{clientId}");
+        Console.Write($"{kvp.Key}, ");
       }
+      Console.Write("] <---");
       Console.WriteLine("");
+    }
+  }
+
+  private static void printGranted(Dictionary<string, int> granted)
+  {
+    foreach (var kvp in granted)
+    {
+      Console.WriteLine("Thread ID = {0}, Granted = {1}", kvp.Key, kvp.Value);
     }
   }
 
