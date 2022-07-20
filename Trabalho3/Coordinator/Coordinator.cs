@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Text;
 
+namespace Coordinator;
 public static class Coordinator {
     public static object Lock = new();
     public static Queue<KeyValuePair<string, TcpClient>> Queue = new();
