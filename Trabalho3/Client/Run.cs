@@ -10,8 +10,7 @@
 
             for (var i = 1; i <= n; i++) {
                 var newClient = new Client(i, r, k);
-                var newThread = new Thread(newClient.Connect);
-                newThread.Start();
+                new Thread(newClient.Connect).Start();
             }
         }
     }

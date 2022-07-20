@@ -1,5 +1,5 @@
 def validate():
-    f = open("/Users/thiago/Projetos/Faculdade/distributed-systems/MEU/Resultados/log.txt", "r")
+    f = open("log.txt", "r")
     lines = f.readlines()
     requests = []
     grants = []
@@ -14,20 +14,24 @@ def validate():
                 print(line)
                 print(len(grants))
                 print(len(releases))
-                raise Exception("1 Invalid log file: invalid grants and releases sequence")
+                raise Exception(
+                    "1 Invalid log file: invalid grants and releases sequence")
             grants.append(int(line.split("-")[1]))
             continue
         if ("[R] Release" in line):
             if (len(releases) != len(grants) - 1):
-                raise Exception("2 Invalid log file: invalid grants and releases sequence")
+                raise Exception(
+                    "2 Invalid log file: invalid grants and releases sequence")
             releases.append(int(line.split("-")[1]))
             continue
 
     for i in range(len(requests)):
         if (requests[i] != grants[i] or grants[i] != releases[i]):
-            raise Exception("3 Invalid log file: invalid grants and releases sequence")
+            raise Exception(
+                "3 Invalid log file: invalid grants and releases sequence")
 
     print("Log file was successfully validated")
+
 
 if __name__ == "__main__":
     validate()
