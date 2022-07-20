@@ -47,7 +47,6 @@ namespace Client {
                     Console.WriteLine($"Client {Id} sending release message to coordinator...");
 
                     i++;
-                    stream.Close();
                 }
             } catch (Exception) {
                 Console.WriteLine("Failed to connect");
@@ -55,6 +54,7 @@ namespace Client {
                 Thread.Sleep(2000);
                 goto connection;
             }
+            stream.Close();
             SocketClient.Close();
         }
 

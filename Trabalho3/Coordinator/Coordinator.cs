@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Collections;
+using System.Net.Sockets;
 using System.Text;
 
 public static class Coordinator {
@@ -48,33 +49,33 @@ public static class Coordinator {
         sw.Flush();
     }
 
-  private static void terminal()
-  {
-    Console.WriteLine(" ------------------------------------------");
-    Console.WriteLine("| Insira:                                  |");
-    Console.WriteLine("|   1: imprimir a fila atual               |");
-    Console.WriteLine("|   2: para imprimir o estado dos clientes |");
-    Console.WriteLine("|   3: para sair                           |");
-    Console.WriteLine(" ------------------------------------------");
-    while (true)
-    {
-      Console.WriteLine("\n-----------------------------------------\n");
-      Console.Write("Insira o comando: ");
-      var n = Convert.ToInt32(Console.ReadLine());
-      switch (n)
-      {
-        case 1:
-          var currentQueue = Queue;
-          printCurrentQueue(currentQueue);
-          break;
-        case 2:
-          var currentGranted = Granted;
-          printGranted(currentGranted);
-          break;
-        case 3:
-          Environment.Exit(Environment.ExitCode);
-          return;
-      }
+    private static void Terminal() {
+        Console.WriteLine(" ------------------------------------------");
+        Console.WriteLine("| Insira:                                  |");
+        Console.WriteLine("|   1: imprimir a fila atual               |");
+        Console.WriteLine("|   2: para imprimir o estado dos clientes |");
+        Console.WriteLine("|   3: para sair                           |");
+        Console.WriteLine(" ------------------------------------------");
+        while (true) {
+            Console.WriteLine("\n-----------------------------------------\n");
+            Console.Write("Insira o comando: ");
+            var n = Convert.ToInt32(Console.ReadLine());
+            switch (n) {
+                case 1:
+                    var currentQueue = Queue;
+                    PrintCurrentQueue(currentQueue);
+                    break;
+                case 2:
+                    var currentGranted = Granted;
+                    PrintGranted(currentGranted);
+                    break;
+                case 3:
+                    Environment.Exit(Environment.ExitCode);
+                    return;
+            }
+        }
+    }
+
     private static void Request(string clientId, TcpClient client) {
         lock (Lock) {
             WriteLog(clientId, MessageType.Request);
@@ -85,18 +86,18 @@ public static class Coordinator {
         }
     }
 
-  private static void printCurrentQueue(Queue<KeyValuePair<string, TcpClient>> queue)
-  {
-    lock (Lock)
-    {
-      Console.WriteLine("");
-      Console.Write("<--- [");
-      foreach (var kvp in queue)
-      {
-        Console.Write($"{kvp.Key}, ");
-      }
-      Console.Write("] <---");
-      Console.WriteLine("");
+    private static void PrintCurrentQueue(Queue<KeyValuePair<string, TcpClient>> queue) {
+        lock (Lock) {
+            Console.WriteLine("");
+            Console.Write("<--- [");
+            foreach (var kvp in queue) {
+                Console.Write($"{kvp.Key}, ");
+            }
+            Console.Write("] <---");
+            Console.WriteLine("");
+        }
+    }
+
     private static void Grant(string clientId, TcpClient client) {
         SendGrantMessage(clientId, client);
         WriteLog(clientId, MessageType.Grant);
@@ -108,19 +109,12 @@ public static class Coordinator {
         }
     }
 
-  private static void printGranted(Dictionary<string, int> granted)
-  {
-    foreach (var kvp in granted)
-    {
-      Console.WriteLine("Thread ID = {0}, Granted = {1}", kvp.Key, kvp.Value);
+    private static void PrintGranted(Dictionary<string, int> granted) {
+        foreach (var kvp in granted) {
+            Console.WriteLine("Thread ID = {0}, Granted = {1}", kvp.Key, kvp.Value);
+        }
     }
-  }
 
-  public static void Main()
-  {
-    new Thread(listener).Start();
-    terminal();
-  }
     private static void Release(string clientId) {
         lock (Lock) {
             WriteLog(clientId, MessageType.Release);
@@ -175,29 +169,6 @@ public static class Coordinator {
         }
     }
 
-
-    private static void Terminal() {
-        Console.WriteLine("Insira:");
-        Console.WriteLine("  1: imprimir a fila atual");
-        Console.WriteLine("  2: para imprimir o estado dos clientes");
-        Console.WriteLine("  3: para sair");
-        while (true) {
-            Console.Write("Insira o comando: ");
-            var n = Convert.ToInt32(Console.ReadLine());
-            Console.WriteLine("");
-            switch (n) {
-                case 1:
-                    PrintCurrentQueue();
-                    break;
-                case 2:
-                    // PrintClientsState();
-                    break;
-                case 3:
-                    Environment.Exit(Environment.ExitCode);
-                    return;
-            }
-        }
-    }
 
     private static void PrintCurrentQueue() {
         lock (Lock) {

@@ -1,5 +1,7 @@
 def validate():
     f = open("log.txt", "r")
+    r = open("resultado.txt", "r")
+    rLines = r.readlines()
     lines = f.readlines()
     requests = []
     grants = []
@@ -30,7 +32,8 @@ def validate():
             raise Exception(
                 "3 Invalid log file: invalid grants and releases sequence")
 
-    print("Log file was successfully validated")
+    if(len(rLines) == 1280):
+        print("Log file was successfully validated")
 
 
 if __name__ == "__main__":
