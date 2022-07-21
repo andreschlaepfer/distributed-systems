@@ -1,6 +1,4 @@
 import sys
-from datetime import datetime
-
 
 def validate():
 
