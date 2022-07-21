@@ -14,12 +14,12 @@ namespace Client {
         public int WaitTime { get; set; }
         public int Port { get; set; }
         public TcpClient SocketClient { get; set; }
+        public byte[] SendRequestData => Encoding.ASCII.GetBytes(GenerateMessage(MessageType.Request));
+        public byte[] SendReleaseData => Encoding.ASCII.GetBytes(GenerateMessage(MessageType.Release));
 
         public void Connect() {
             var i = 1;
             var numTries = 0;
-            var sendRequestData = Encoding.ASCII.GetBytes(GenerateMessage(MessageType.Request));
-            var sendReleaseData = Encoding.ASCII.GetBytes(GenerateMessage(MessageType.Release));
         connection:
             if (numTries > 10) {
                 return;
@@ -28,24 +28,18 @@ namespace Client {
                 while (i <= Repetitions) {
                     SocketClient = new TcpClient("127.0.0.1", Port);
                     var stream = SocketClient.GetStream();
-                    //request
-                    stream.Write(sendRequestData, 0, sendRequestData.Length);
+                    stream.Write(SendRequestData, 0, SendRequestData.Length);
                     Console.WriteLine($"Client {Id} sending request message to coordinator...");
 
-                    //Read Grant
                     var sr = new StreamReader(stream);
                     var response = sr.ReadLine();
                     if (response.StartsWith("2")) {
-                        //Enter critical area
                         WriteLog();
                         Console.WriteLine(response);
                         Thread.Sleep(WaitTime);
-
-                        //release
-                        stream.Write(sendReleaseData, 0, sendReleaseData.Length);
+                        stream.Write(SendReleaseData, 0, SendReleaseData.Length);
                         Console.WriteLine($"Client {Id} sending release message to coordinator...");
                     }
-
                     i++;
                     stream.Close();
                     SocketClient.Close();
@@ -59,7 +53,7 @@ namespace Client {
         }
 
         public void WriteLog() {
-            var folderName = Path.Combine("../", "Resultados");
+            var folderName = Path.Combine($"{Directory.GetCurrentDirectory()}/..", "Resultados");
             Directory.CreateDirectory(folderName);
             var fileName = Path.Combine(folderName, "resultado.txt");
             if (!File.Exists(fileName)) {

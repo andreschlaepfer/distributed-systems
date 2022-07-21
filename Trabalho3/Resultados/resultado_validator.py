@@ -4,18 +4,20 @@ from datetime import datetime
 
 
 def validate():
-    dir = os.path.dirname(os.path.realpath(__file__)) + "/log.txt"
-    if sys.argv[1]:
-        dir = sys.argv[1]
+    #dir = os.path.dirname(os.path.realpath(__file__)) + "/log.txt"
+    dir = "C:/Users/andre/ProjetosUFRJ/distributed-systems/Trabalho3/Resultados/resultado.txt"
+    # if sys.argv[1]:
+    #     dir = sys.argv[1]
 
     expected_size = 1280  # make get_expected_size()
 
     f = open(dir, "r")
     lines = f.readlines()
+    print(len(lines))
     if len(lines) != expected_size:
         raise Exception(
             "Invalid result file: number of lines is different than expected")
-    for i in lines.index:
+    for i in range(len(lines)):
         if lines[i] == lines[-1]:
             break
         [firstT, firstM] = lines[i].split(" ")[-1].split('.')
