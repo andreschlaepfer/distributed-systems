@@ -1,8 +1,12 @@
 import os 
+import sys
 
 def validate():
-    dir = os.path.dirname(os.path.realpath(__file__))
-    f = open(dir + "/log.txt", "r")
+    dir = os.path.dirname(os.path.realpath(__file__)) + "/log.txt"
+    if sys.argv[1]:
+        dir = sys.argv[1]
+
+    f = open(dir, "r")
     lines = f.readlines()
     requests = []
     grants = []
