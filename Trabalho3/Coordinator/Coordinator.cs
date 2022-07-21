@@ -231,7 +231,11 @@ public static class Coordinator
 
   public static void Main()
   {
-    new Thread(Listener).Start();
+    Thread thread = new Thread(Listener)
+    {
+      IsBackground = true
+    };
+    thread.Start();
     Terminal();
   }
 }
