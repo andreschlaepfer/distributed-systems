@@ -1,19 +1,19 @@
-import os
 import sys
 from datetime import datetime
 
 
 def validate():
-    #dir = os.path.dirname(os.path.realpath(__file__)) + "/log.txt"
-    dir = "C:/Users/andre/ProjetosUFRJ/distributed-systems/Trabalho3/Resultados/resultado.txt"
-    # if sys.argv[1]:
-    #     dir = sys.argv[1]
 
-    expected_size = 1280  # make get_expected_size()
+    dir = sys.argv[1]
+    n = int(sys.argv[2])
+    r = int(sys.argv[3])
+
+    f = open(dir, "r")
+
+    expected_size = n*r
 
     f = open(dir, "r")
     lines = f.readlines()
-    print(len(lines))
     if len(lines) != expected_size:
         raise Exception(
             "Invalid result file: number of lines is different than expected")
@@ -25,7 +25,7 @@ def validate():
         if diffBetweenTime(firstT, nextT)*1000 + diffBetweenMs(firstM, nextM) < 0:
             raise Exception(
                 "Invalid result file: Lines out of order")
-    print("Brabo")
+    print("Result file was successfully validated")
 
 
 def diffBetweenTime(fT, lT):
