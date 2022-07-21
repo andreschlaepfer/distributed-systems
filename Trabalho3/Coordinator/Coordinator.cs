@@ -17,6 +17,7 @@ public static class Coordinator
     Release = 3
   }
 
+  #region Auxiliary methods
   private static void WriteLog(string clientId, MessageType msgType)
   {
     var folderName = Path.Combine($"{Directory.GetCurrentDirectory()}/..", "Resultados");
@@ -55,7 +56,9 @@ public static class Coordinator
     sw.WriteLine(message);
     sw.Flush();
   }
+  #endregion
 
+  #region Handle messages methods
   private static void Request(string clientId, TcpClient client)
   {
     lock (Lock)
@@ -99,7 +102,9 @@ public static class Coordinator
       Grant(key, value);
     }
   }
+  #endregion
 
+  #region Connection methods
   public static void ClientHandler(TcpClient client)
   {
     var stream = client.GetStream();
@@ -142,7 +147,9 @@ public static class Coordinator
       thread.Start();
     }
   }
+  #endregion
 
+  #region Terminal methods
   public static void Terminal()
   {
     Console.WriteLine("");
@@ -225,6 +232,7 @@ public static class Coordinator
       Console.WriteLine($"Thread ID = {key}, Granted = {value}");
     }
   }
+  #endregion
 
   public static void Main()
   {
