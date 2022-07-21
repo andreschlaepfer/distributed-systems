@@ -1,6 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 
+
 namespace Client
 {
   public class Client
@@ -59,6 +60,7 @@ namespace Client
 
           i++;
           SocketClient.Close();
+
         }
       }
       catch (Exception)
