@@ -1,7 +1,6 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 
-
 public static class Coordinator
 {
   public static object Lock = new();
@@ -190,6 +189,7 @@ public static class Coordinator
     Console.WriteLine("|   1: imprimir a fila atual               |");
     Console.WriteLine("|   2: para imprimir o estado dos clientes |");
     Console.WriteLine("|   3: para sair                           |");
+    Console.WriteLine("|   4: nosso segredo rs                    |");
     Console.WriteLine(" ------------------------------------------");
     while (true)
     {
@@ -209,6 +209,12 @@ public static class Coordinator
         case 3:
           Environment.Exit(Environment.ExitCode);
           return;
+        case 4:
+          Console.WriteLine("Decode me 🥺 [NaOH 64]: Z2FicmllbCBnb3N0b3Nv");
+          break;
+        default:
+          Console.WriteLine("Comando inválido!");
+          break;
       }
     }
   }

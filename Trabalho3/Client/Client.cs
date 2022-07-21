@@ -33,7 +33,7 @@ namespace Client
         Console.WriteLine($" > Coordinator granted access to client {Id}");
         Thread.Sleep(WaitTime);
 
-        sendMessage(MessageType.Release);
+        SendMessage(MessageType.Release);
         Console.WriteLine($" > Client {Id} sent release message to coordinator");
       }
     }
@@ -53,7 +53,7 @@ namespace Client
         {
           SocketClient = new TcpClient("127.0.0.1", Port);
 
-          sendMessage(MessageType.Request);
+          SendMessage(MessageType.Request);
           Console.WriteLine($" > Client {Id} sent request message to coordinator");
 
           ListenGrant();
@@ -88,7 +88,7 @@ namespace Client
       writer.WriteLine($"Client Id: {Id}. DateTime: {DateTime.Now:dd/MM/yyyy HH:mm:ss.fff}");
     }
 
-    public void sendMessage(MessageType msgType)
+    public void SendMessage(MessageType msgType)
     {
       var stream = SocketClient.GetStream();
       var size = 10;
